@@ -45,6 +45,24 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.password").value("password"));
 
         verify(userService, times(1)).create(anyString(), anyString(), anyString(), anyString());
+    }
 
+    @Test
+    void shouldFindUserByEmail() throws Exception {
+        User user = new User(1L, "Eren", "Thomas", "e@gmail.com", "password");
+
+        when(userService.find(anyString())).thenReturn(user);
+
+        mockMvc.perform(get("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("email", "e@gmail.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.firstName").value("Eren"))
+                .andExpect(jsonPath("$.lastName").value("Thomas"))
+                .andExpect(jsonPath("$.email").value("e@gmail.com"))
+                .andExpect(jsonPath("$.password").value("password"));
+
+        verify(userService, times(1)).find(anyString());
     }
 }

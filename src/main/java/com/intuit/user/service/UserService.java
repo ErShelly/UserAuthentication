@@ -16,4 +16,8 @@ public class UserService {
         User user = new User(firstName, lastName, email, password);
         return userRepository.save(user);
     }
+
+    public User find(String email){
+        return userRepository.findByEmail(email);
+    }
 }

@@ -26,9 +26,19 @@ class UserServiceTest {
         userCreated.setId(1L);
 
         when(userRepository.save(any(User.class))).thenReturn(userCreated);
-        User user = userService.create("Eren", "Thomas", "e@agmail.com", "password");
+        User actualUser = userService.create("Eren", "Thomas", "e@agmail.com", "password");
 
-        assertEquals(userCreated, user);
+        assertEquals(userCreated, actualUser);
         verify(userRepository, times(1)).save(userToBeCreated);
+    }
+
+    @Test
+    void shouldFindUserByEmail(){
+        User user = new User(1L,"Eren", "Thomas", "e@agmail.com", "password");
+        when(userRepository.findByEmail(anyString())).thenReturn(user);
+
+        User actualUser = userService.find("e@gmail.com");
+        assertEquals(user, actualUser);
+        verify(userRepository, times(1)).findByEmail(anyString());
     }
 }
