@@ -26,7 +26,7 @@ class UserServiceTest {
         userCreated.setId(1L);
 
         when(userRepository.save(any(User.class))).thenReturn(userCreated);
-        User user = userService.create(userToBeCreated);
+        User user = userService.create("Eren", "Thomas", "e@agmail.com", "password");
 
         assertEquals(userCreated, user);
         verify(userRepository, times(1)).save(userToBeCreated);

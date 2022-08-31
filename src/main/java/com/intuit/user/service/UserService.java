@@ -6,13 +6,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
-    private UserRepository  userRepository;
+    private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public User create(User user){
+    public User create(String firstName, String lastName, String email, String password){
+        User user = new User(firstName, lastName, email, password);
         return userRepository.save(user);
     }
 }
