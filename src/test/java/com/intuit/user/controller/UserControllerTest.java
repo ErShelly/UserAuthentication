@@ -6,10 +6,12 @@ import com.intuit.user.dto.SignUpRequestDTO;
 import com.intuit.user.model.User;
 import com.intuit.user.service.UserService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.*;
@@ -23,16 +25,17 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserControllerTest {
     @MockBean
     private UserService userService;
-
+    @Mock
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     private MockMvc mockMvc;
 
     @Test
     void shouldCreateUser() throws Exception {
-        User userCreated = new User("Eren", "Thomas", "e@gmail.com", "password");
+        User userCreated = new User("Eren", "Thomas", "e@gmail.com", "encoded-password");
         userCreated.setId(1L);
 
-        when(userService.create(anyString(),anyString(), anyString(), anyString())).thenReturn(userCreated);
+        when(userService.create(anyString(), anyString(), anyString(), anyString())).thenReturn(userCreated);
 
         SignUpRequestDTO userRequest = new SignUpRequestDTO();
         userRequest.setFirstName("Eren");
@@ -43,6 +46,8 @@ class UserControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         String requestJson = objectMapper.writeValueAsString(userRequest);
 
+        when(bCryptPasswordEncoder.encode("password")).thenReturn("encoded-password");
+
         mockMvc.perform(post("/api/users/signUp")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
@@ -51,16 +56,17 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.firstName").value("Eren"))
                 .andExpect(jsonPath("$.lastName").value("Thomas"))
                 .andExpect(jsonPath("$.email").value("e@gmail.com"))
-                .andExpect(jsonPath("$.password").value("password"));
+                .andExpect(jsonPath("$.password").value("encoded-password"));
 
         verify(userService, times(1)).create(anyString(), anyString(), anyString(), anyString());
     }
 
     @Test
     void shouldAuthenticateUser() throws Exception {
-        User user = new User("Eren", "Thomas", "e@gmail.com", "password");
+        User user = new User("Eren", "Thomas", "e@gmail.com", "encoded-password");
         user.setId(1L);
 
+        when(bCryptPasswordEncoder.encode("password")).thenReturn("encoded-password");
         when(userService.authenticate(anyString(), anyString())).thenReturn(user);
 
         LoginRequestDTO userRequest = new LoginRequestDTO();
@@ -78,7 +84,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.firstName").value("Eren"))
                 .andExpect(jsonPath("$.lastName").value("Thomas"))
                 .andExpect(jsonPath("$.email").value("e@gmail.com"))
-                .andExpect(jsonPath("$.password").value("password"));
+                .andExpect(jsonPath("$.password").value("encoded-password"));
 
         verify(userService, times(1)).authenticate(anyString(), anyString());
     }
