@@ -1,5 +1,7 @@
 package com.intuit.user.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intuit.user.dto.SignUpRequestDTO;
 import com.intuit.user.model.User;
 import com.intuit.user.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -31,12 +33,18 @@ class UserControllerTest {
 
         when(userService.create(anyString(),anyString(), anyString(), anyString())).thenReturn(userCreated);
 
-        mockMvc.perform(post("/api/users")
+        SignUpRequestDTO userRequest = new SignUpRequestDTO();
+        userRequest.setFirstName("Eren");
+        userRequest.setLastName("Thomas");
+        userRequest.setEmail("e@gmail.com");
+        userRequest.setPassword("password");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestJson = objectMapper.writeValueAsString(userRequest);
+
+        mockMvc.perform(post("/api/users/signUp")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("firstName", "Eren")
-                        .param("lastName", "Thomas")
-                        .param("email", "e@gmail.com")
-                        .param("password", "password"))
+                        .content(requestJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.firstName").value("Eren"))
@@ -53,7 +61,7 @@ class UserControllerTest {
 
         when(userService.find(anyString())).thenReturn(user);
 
-        mockMvc.perform(get("/api/users")
+        mockMvc.perform(get("/api/users/find")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("email", "e@gmail.com"))
                 .andExpect(status().isOk())
