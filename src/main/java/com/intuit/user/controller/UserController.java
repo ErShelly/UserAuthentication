@@ -1,5 +1,6 @@
 package com.intuit.user.controller;
 
+import com.intuit.user.dto.LoginRequestDTO;
 import com.intuit.user.dto.SignUpRequestDTO;
 import com.intuit.user.model.User;
 import com.intuit.user.service.UserService;
@@ -30,5 +31,11 @@ public class UserController {
                 signUpRequestDTO.getLastName(),
                 signUpRequestDTO.getEmail(),
                 signUpRequestDTO.getPassword()), HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<User> createUser(@RequestBody LoginRequestDTO loginRequestDTO) {
+        return new ResponseEntity<>(userService.authenticate(loginRequestDTO.getEmail(),
+                loginRequestDTO.getPassword()), HttpStatus.OK);
     }
 }

@@ -1,6 +1,7 @@
 package com.intuit.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intuit.user.dto.LoginRequestDTO;
 import com.intuit.user.dto.SignUpRequestDTO;
 import com.intuit.user.model.User;
 import com.intuit.user.service.UserService;
@@ -53,6 +54,33 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.password").value("password"));
 
         verify(userService, times(1)).create(anyString(), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void shouldAuthenticateUser() throws Exception {
+        User user = new User("Eren", "Thomas", "e@gmail.com", "password");
+        user.setId(1L);
+
+        when(userService.authenticate(anyString(), anyString())).thenReturn(user);
+
+        LoginRequestDTO userRequest = new LoginRequestDTO();
+        userRequest.setEmail("e@gmail.com");
+        userRequest.setPassword("password");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestJson = objectMapper.writeValueAsString(userRequest);
+
+        mockMvc.perform(post("/api/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.firstName").value("Eren"))
+                .andExpect(jsonPath("$.lastName").value("Thomas"))
+                .andExpect(jsonPath("$.email").value("e@gmail.com"))
+                .andExpect(jsonPath("$.password").value("password"));
+
+        verify(userService, times(1)).authenticate(anyString(), anyString());
     }
 
     @Test

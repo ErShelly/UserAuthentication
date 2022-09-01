@@ -1,5 +1,6 @@
 package com.intuit.user.service;
 
+import com.intuit.user.exception.InvalidCredentialsException;
 import com.intuit.user.exception.UserNotFoundException;
 import com.intuit.user.model.User;
 import com.intuit.user.repository.UserRepository;
@@ -22,6 +23,13 @@ public class UserService {
         User user =  userRepository.findByEmail(email);
 
         if(user == null) throw new UserNotFoundException(String.format("No user exists with email : %s", email));
+        return  user;
+    }
+
+    public User authenticate(String email, String password) throws InvalidCredentialsException{
+        User user =  userRepository.findByEmailAndPassword(email, password);
+
+        if(user == null) throw new InvalidCredentialsException("Invalid Credentials.");
         return  user;
     }
 }
