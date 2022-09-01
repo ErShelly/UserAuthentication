@@ -1,5 +1,6 @@
 package com.intuit.user.service;
 
+import com.intuit.user.exception.UserNotFoundException;
 import com.intuit.user.model.User;
 import com.intuit.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User find(String email){
-        return userRepository.findByEmail(email);
+    public User find(String email) throws UserNotFoundException{
+        User user =  userRepository.findByEmail(email);
+
+        if(user == null) throw new UserNotFoundException(String.format("No user exists with email : %s", email));
+        return  user;
     }
 }
