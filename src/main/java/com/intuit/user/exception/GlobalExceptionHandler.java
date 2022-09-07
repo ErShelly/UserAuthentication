@@ -45,7 +45,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         List<String> details = new ArrayList<String>();
         details.add(ex.getMessage());
 
-        ApiErrorDTO apiErrorDTO = new ApiErrorDTO(LocalDateTime.now(), HttpStatus.NOT_FOUND, "Incorrect Username/Password", details);
+        ApiErrorDTO apiErrorDTO = new ApiErrorDTO(LocalDateTime.now(), HttpStatus.BAD_REQUEST, "Incorrect Username/Password", details);
         return new ResponseEntity<>(apiErrorDTO, apiErrorDTO.getStatus());
     }
 
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         List<String> details = new ArrayList<String>();
         details.add(ex.getMessage());
 
-        ApiErrorDTO apiErrorDTO = new ApiErrorDTO(LocalDateTime.now(), HttpStatus.NOT_FOUND, "Validation Error", details);
+        ApiErrorDTO apiErrorDTO = new ApiErrorDTO(LocalDateTime.now(), HttpStatus.BAD_REQUEST, "Validation Error", details);
         return new ResponseEntity<>(apiErrorDTO, apiErrorDTO.getStatus());
     }
 
@@ -75,6 +75,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(apiErrorDTO, apiErrorDTO.getStatus());
     }
-
-
 }

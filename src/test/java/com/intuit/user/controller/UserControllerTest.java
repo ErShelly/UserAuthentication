@@ -5,6 +5,7 @@ import com.intuit.user.dto.LoginRequestDTO;
 import com.intuit.user.dto.SignUpRequestDTO;
 import com.intuit.user.model.User;
 import com.intuit.user.service.UserService;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -37,11 +39,7 @@ class UserControllerTest {
 
         when(userService.create(anyString(), anyString(), anyString(), anyString())).thenReturn(userCreated);
 
-        SignUpRequestDTO userRequest = new SignUpRequestDTO();
-        userRequest.setFirstName("Eren");
-        userRequest.setLastName("Thomas");
-        userRequest.setEmail("e@gmail.com");
-        userRequest.setPassword("password");
+        SignUpRequestDTO userRequest = new SignUpRequestDTO("Eren", "Thomas", "e@gmail.com", "password");
 
         ObjectMapper objectMapper = new ObjectMapper();
         String requestJson = objectMapper.writeValueAsString(userRequest);
@@ -106,5 +104,24 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.password").value("password"));
 
         verify(userService, times(1)).find(anyString());
+    }
+
+    @Test
+    void shouldReturnErrorWhenRequiredFieldsAreEmpty() throws Exception {
+        SignUpRequestDTO userRequest = new SignUpRequestDTO("", "","","");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestJson = objectMapper.writeValueAsString(userRequest);
+
+        mockMvc.perform(post("/api/users/signUp")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Validation Errors"))
+                .andExpect(jsonPath("$.errors.[0]").value("First name cannot be blank"))
+                .andExpect(jsonPath("$.errors.[1]").value("Email cannot be blank"))
+                .andExpect(jsonPath("$.errors.[2]").value("Password cannot be blank"))
+                .andExpect(jsonPath("$.errors.[3]").value("Last name cannot be blank"));
     }
 }
