@@ -6,11 +6,14 @@ import com.intuit.user.model.User;
 import com.intuit.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.jws.soap.SOAPBinding;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 @RestController
+@Validated
 @RequestMapping("/api/users")
 public class UserController {
 
@@ -21,12 +24,12 @@ public class UserController {
     }
 
     @GetMapping("/find")
-    public ResponseEntity<User> getUser(@RequestParam String email) {
+    public ResponseEntity<User> getUser(@Valid @NotBlank @RequestParam(required = true) String email) {
         return new ResponseEntity<>(userService.find(email), HttpStatus.OK);
     }
 
     @PostMapping("/signUp")
-    public ResponseEntity<User> createUser(@RequestBody SignUpRequestDTO signUpRequestDTO) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody SignUpRequestDTO signUpRequestDTO) {
         return new ResponseEntity<>(userService.create(signUpRequestDTO.getFirstName(),
                 signUpRequestDTO.getLastName(),
                 signUpRequestDTO.getEmail(),
@@ -34,7 +37,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> authenticate(@RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<User> authenticate(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         return new ResponseEntity<>(userService.authenticate(loginRequestDTO.getEmail(),
                 loginRequestDTO.getPassword()), HttpStatus.OK);
     }

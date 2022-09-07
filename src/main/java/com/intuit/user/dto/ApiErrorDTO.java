@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ApiError {
+public class ApiErrorDTO {
     private LocalDateTime timestamp;
     private HttpStatus status;
     private String message;

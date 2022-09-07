@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.*;
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -18,9 +19,14 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @NotBlank(message = "First name cannot be blank")
     private String firstName;
+    @NotBlank(message = "Last name cannot be blank")
     private String lastName;
+    @NotBlank(message = "Email cannot be blank")
     private String email;
+    @NotBlank(message = "Password cannot be blank")
     private String password;
 
     public User(String firstName, String lastName, String email, String password) {

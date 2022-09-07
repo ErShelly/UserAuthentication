@@ -1,22 +1,16 @@
 package com.intuit.user.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.validation.constraints.NotBlank;
+
+@Getter
+@Setter
 public class LoginRequestDTO {
+    @NotBlank(message = "Please enter email")
     private String email;
+
+    @NotBlank(message = "Please enter password")
     private String password;
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }
