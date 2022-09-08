@@ -15,11 +15,7 @@ class UserRepositoryTest {
 
     @Test
     void shouldReturnUserByAGivenEmail() {
-        User expectedUser = new User(1L,
-                "First name",
-                "Last name",
-                "email@example.com",
-                "password");
+        User expectedUser = new User(1L, "fname", "lname", "email@example.com", "password");
         userRepository.save(expectedUser);
 
         Optional<User> actualUserOptional = userRepository.findByEmail("email@example.com");
@@ -27,10 +23,9 @@ class UserRepositoryTest {
         User actualUser = actualUserOptional.get();
 
         assertEquals("email@example.com", actualUser.getEmail());
-        assertEquals("First name", actualUser.getFirstName());
-        assertEquals("Last name", actualUser.getLastName());
+        assertEquals("fname", actualUser.getFirstName());
+        assertEquals("lname", actualUser.getLastName());
         assertEquals("password", actualUser.getPassword());
-
     }
 
     @Test
