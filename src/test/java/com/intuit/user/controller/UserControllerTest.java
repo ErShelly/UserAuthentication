@@ -3,6 +3,7 @@ package com.intuit.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intuit.user.dto.LoginRequestDTO;
 import com.intuit.user.dto.SignUpRequestDTO;
+import com.intuit.user.exception.InvalidCredentialsException;
 import com.intuit.user.model.User;
 import com.intuit.user.service.UserService;
 import org.hamcrest.Matchers;
@@ -15,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
+
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -67,9 +70,7 @@ class UserControllerTest {
         when(bCryptPasswordEncoder.encode("password")).thenReturn("encoded-password");
         when(userService.authenticate(anyString(), anyString())).thenReturn(user);
 
-        LoginRequestDTO userRequest = new LoginRequestDTO();
-        userRequest.setEmail("e@gmail.com");
-        userRequest.setPassword("password");
+        LoginRequestDTO userRequest = new LoginRequestDTO("e@gmail.com","password");
 
         ObjectMapper objectMapper = new ObjectMapper();
         String requestJson = objectMapper.writeValueAsString(userRequest);
@@ -123,5 +124,27 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.errors.[1]").value("Email cannot be blank"))
                 .andExpect(jsonPath("$.errors.[2]").value("Password cannot be blank"))
                 .andExpect(jsonPath("$.errors.[3]").value("Last name cannot be blank"));
+    }
+
+    @Test
+    void shouldReturnErrorWhenIncorrectCredentials() throws Exception {
+        LoginRequestDTO loginRequest = new LoginRequestDTO("ss@gmail.com", "password");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestJson = objectMapper.writeValueAsString(loginRequest);
+
+        when(userService.find(anyString())).thenReturn(new User());
+        when(userService.authenticate(anyString(), anyString())).thenThrow(new InvalidCredentialsException("Invalid Credentials"));
+
+        mockMvc.perform(post("/api/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Incorrect Username/Password"))
+                .andExpect(jsonPath("$.errors.[0]").value("Invalid Credentials"));
+
+        verify(userService, times(1)).find(anyString());
+        verify(userService, times(1)).authenticate(anyString(), anyString());
     }
 }

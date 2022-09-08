@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.*;
 
 @Getter
 @Setter
@@ -19,8 +19,10 @@ public class SignUpRequestDTO {
     private String lastName;
 
     @NotBlank(message = "Email cannot be blank")
+    @Email
     private String email;
 
     @NotBlank(message = "Password cannot be blank")
+    @Min(10)
     private String password;
 }

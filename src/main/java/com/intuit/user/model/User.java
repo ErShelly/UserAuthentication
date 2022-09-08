@@ -25,8 +25,10 @@ public class User {
     @NotBlank(message = "Last name cannot be blank")
     private String lastName;
     @NotBlank(message = "Email cannot be blank")
+    @Email
     private String email;
     @NotBlank(message = "Password cannot be blank")
+    @Min(10)
     private String password;
 
     public User(String firstName, String lastName, String email, String password) {
